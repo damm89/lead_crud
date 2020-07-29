@@ -1,0 +1,70 @@
+version: "3.7"
+
+services:
+    backend: 
+        build: ./backend
+        image: "backend"
+        ports: 
+            - "8000:8000"
+        networks:
+            - "appnetwork"
+        
+        volumes:
+            - ./backend:/backend
+        
+        stdin_open: true
+        tty: true
+        
+        depends_on: 
+            - "pgdb"
+
+        environment:
+            - DB_HOST=pgdb
+            - DB_NAME=movie_app
+            - DB_USER=dbuser
+            - DB_PASS=dbpassword
+        
+        command: >
+            sh -c "python3 manage.py runserver 0.0.0.0:8000"
+    
+    pgdb:
+        image: "postgres:10-alpine"
+
+        networks:
+            - "appnetwork"
+
+        environment:
+            - POSTGRES_USER=dbuser
+            - POSTGRES_PASSWORD=dbpassword
+            - POSTGRES_DB=movie_app
+
+    frontend:
+        build: ./frontend
+
+        image: "frontend"
+
+        ports:
+            - "3000:3000"
+
+        networks:
+            - "appnetwork"
+
+        volumes:
+            - ./frontend:/frontend
+            - /frontend/node_modules
+        
+        stdin_open: true
+        tty: true
+        
+        environment: 
+            - NODE_ENV=development
+
+        depends_on:
+            - backend
+
+        command: >
+            sh -c "npm start"
+    
+networks:
+    appnetwork:
+        driver: bridge
