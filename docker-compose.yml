@@ -17,16 +17,18 @@ services:
         
         depends_on: 
             - "pgdb"
-
-        environment:
-            - DB_HOST=pgdb
-            - DB_NAME=movie_app
-            - DB_USER=dbuser
-            - DB_PASS=dbpassword
         
         command: >
-            sh -c "python3 manage.py runserver 0.0.0.0:8000"
+            sh -c "python manage.py wait_for_db && 
+                    python manage.py migrate &&
+                    python manage.py runserver 0.0.0.0:8000"
     
+        environment:
+            - DB_HOST=pgdb
+            - DB_NAME=lead_app
+            - DB_USER=dbuser
+            - DB_PASS=dbpassword
+
     pgdb:
         image: "postgres:10-alpine"
 
@@ -36,7 +38,7 @@ services:
         environment:
             - POSTGRES_USER=dbuser
             - POSTGRES_PASSWORD=dbpassword
-            - POSTGRES_DB=movie_app
+            - POSTGRES_DB=lead_app
 
     frontend:
         build: ./frontend
