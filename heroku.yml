@@ -4,8 +4,6 @@ services:
         image: "backend"
         ports: 
             - "8000:8000"
-        networks:
-            - "appnetwork"
         
         volumes:
             - ./backend:/backend
@@ -30,14 +28,7 @@ services:
     pgdb:
         image: "postgres:10-alpine"
 
-        networks:
-            - "appnetwork"
-
         environment:
             - POSTGRES_USER=dbuser
             - POSTGRES_PASSWORD=dbpassword
             - POSTGRES_DB=lead_app
-    
-networks:
-    appnetwork:
-        driver: bridge
