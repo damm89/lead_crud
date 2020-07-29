@@ -39,7 +39,7 @@ class PublicUserApiTests(TestCase):
         Test creating a user that exists
         """
         payload = {
-            'name': 'Test1 Test2'
+            'name': 'Test1 Test2',
             'email': 'test@test.com',
             'password': 'hello'
         }
@@ -89,8 +89,8 @@ class PublicUserApiTests(TestCase):
         """
         create_user(email='test@test.com', password='hello')
         payload = {
-            email: 'test@test.com',
-            password: 'goodbye',
+            'email': 'test@test.com',
+            'password': 'goodbye',
         }
 
         response = self.client.post(TOKEN_URL, payload)
