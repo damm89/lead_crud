@@ -4,7 +4,7 @@ class CustomUserPermission(permissions.BasePermission):
     
     def has_permission(self, request, view):
         """
-        Overwrites permissions for the user
+        Overwrites permissions for user on leads objects
         """
         if not request.user.is_authenticated:
             return False
@@ -14,7 +14,7 @@ class CustomUserPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         """
-        Overwrites user permissions on object
+        Overwrites user permissions on leads object
         """
         if not request.user.is_authenticated:
             return False

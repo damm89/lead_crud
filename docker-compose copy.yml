@@ -39,6 +39,33 @@ services:
             - POSTGRES_USER=dbuser
             - POSTGRES_PASSWORD=dbpassword
             - POSTGRES_DB=lead_app
+
+    frontend:
+        build: ./frontend
+
+        image: "frontend"
+
+        ports:
+            - "3000:3000"
+
+        networks:
+            - "appnetwork"
+
+        volumes:
+            - ./frontend:/frontend
+            - /frontend/node_modules
+        
+        stdin_open: true
+        tty: true
+        
+        environment: 
+            - NODE_ENV=development
+
+        depends_on:
+            - backend
+
+        command: >
+            sh -c "npm start"
     
 networks:
     appnetwork:
