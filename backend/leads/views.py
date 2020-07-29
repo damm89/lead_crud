@@ -4,16 +4,21 @@ from rest_framework.permissions import IsAuthenticated
 
 from leads import serializers
 from leads.models import Lead
+from leads.permissions import CustomUserPermission
 
 
 class LeadViewSet(viewsets.GenericViewSet, 
                     mixins.ListModelMixin,
-                    mixins.CreateModelMixin):
+                    mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.RetrieveModelMixin):
     """
     Manage leads
     """
     authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (CustomUserPermission, )
+    #permission_classes = (IsAuthenticated, )
 
     queryset = Lead.objects.all()
     serializer_class = serializers.LeadSerializer

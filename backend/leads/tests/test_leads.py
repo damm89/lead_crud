@@ -6,9 +6,15 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from leads.models import Lead
-from leads.serializers import *
+from leads.serializers import LeadSerializer
 
 LEADS_URL = reverse('leads:lead-list')
+
+def get_lead_url(lead_id):
+    """
+    Get the URL for the Lead with id <lead_id>
+    """
+    return reverse('leads:lead-detail', args=[lead_id])
 
 class PublicIngredientsApiTests(TestCase):
     """
@@ -95,3 +101,92 @@ class PrivateIngredientApiTests(TestCase):
         response = self.client.post(LEADS_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_view_lead_detail(self):
+        """
+        Test viewing lead detail
+        """
+        lead = Lead.objects.create(
+                name='Jane Doe',
+                credit_score=800,
+                created_by=self.user,
+            )
+        url = get_lead_url(lead.id)
+        response = self.client.get(url)
+        serializer = LeadSerializer(lead)
+        self.assertEqual(response.data, serializer.data)
+
+    def test_patch_own_lead(self):
+        """
+        Test updating lead created_by user
+        """
+        lead = Lead.objects.create(
+                name='Jane Doe',
+                credit_score=800,
+                created_by=self.user,
+            )
+
+        payload = {'credit_score': 750}
+        self.client.patch(get_lead_url(lead.id), payload)
+
+        lead.refresh_from_db()
+        self.assertEqual(lead.credit_score, payload['credit_score'])
+    
+    def test_put_own_lead(self):
+        """
+        Test updating lead created_by user
+        """
+        lead = Lead.objects.create(
+                name='Jane Doe',
+                credit_score=800,
+                created_by=self.user,
+            )
+
+        payload = {'name': 'John Doe',
+                    'credit_score': 750}
+
+        self.client.put(get_lead_url(lead.id), payload)
+
+        lead.refresh_from_db()
+        self.assertEqual(lead.credit_score, payload['credit_score'])
+        self.assertEqual(lead.name, payload['name'])
+
+    def test_patch_other_lead(self):
+        """
+        Test updating lead created_by user
+        """
+        other_user = get_user_model().objects.create_user(
+            name='hello2',
+            email='test2@test.com',
+            password='hello',
+        )
+
+        lead = Lead.objects.create(
+                name='Jane Doe',
+                credit_score=800,
+                created_by=other_user,
+            )
+
+        payload = {'credit_score': 750}
+        response = self.client.patch(get_lead_url(lead.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_put_other_lead(self):
+        """
+        Test updating lead created_by user
+        """
+        other_user = get_user_model().objects.create_user(
+            name='hello2',
+            email='test2@test.com',
+            password='hello',
+        )
+
+        lead = Lead.objects.create(
+                name='Jane Doe',
+                credit_score=800,
+                created_by=other_user,
+            )
+
+        payload = {'credit_score': 750}
+        response = self.client.put(get_lead_url(lead.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

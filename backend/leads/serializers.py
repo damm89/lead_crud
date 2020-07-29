@@ -9,5 +9,5 @@ class LeadSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Lead
-        fields = ('id', 'name')
-        read_only_fields = ('id',)
+        fields = ('id', 'name', 'created_by', 'credit_score')
+        read_only_fields = ('id', 'created_by')
