@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from . import models
+
+class LeadsAdmin(admin.ModelAdmin):
+    ordering = ['id']
+    list_display = ['name']
+
+admin.site.register(models.Lead, LeadsAdmin)
